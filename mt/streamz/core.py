@@ -18,6 +18,7 @@ class rebatch(Stream):
 
     Examples
     --------
+    >>> from mt.streamz import Stream
     >>> source = Stream()
     >>> source.partition(3).rebatch(4).sink(print)
     >>> for i in range(12):
@@ -81,6 +82,7 @@ class batch_map(Stream):
 
     Examples
     --------
+    >>> from mt.streamz import Stream
     >>> source = Stream()
     >>> source.partition(3).batch_map(lambda x: 2*x).sink(print)
     >>> for i in range(6):
