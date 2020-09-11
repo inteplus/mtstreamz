@@ -1,7 +1,7 @@
 '''Utitilites related to indexing.'''
 
 
-__all__ = ['IndexGrouping', 'on_list', 'hash_int', 'concat_funcs']
+__all__ = ['IndexGrouping', 'on_list', 'hash_int', 'join_funcs']
 
 
 def hash_int(i):
@@ -102,22 +102,28 @@ def on_list(func):
     return func_on_list
 
 
-def concat_funcs(*funcs):
+def join_funcs(*funcs, left_to_right=True):
     '''Concatenate functions taking a single argument into a single function.
 
     Parameters
     ----------
     *funcs : list
         list of functions f1(x), f2(x), ..., fn(x)
+    left_to_right : boolean
+        whether to concatenate from left to right or from right to left.
 
     Returns
     -------
     func : function
-        The function f(x) = f1(f2(...fn(x)...))
+        The function `f(x) = fn(...f2(f1(x))...)` if left_to_right is True, else `f(x) = f1(f2(...fn(x)...))`.
     '''
 
-    def the_func(x):
+    def left_to_right_func(x):
+        for f in funcs:
+            x = f(x)
+        return x
+    def right_to_left_func(x):
         for f in reversed(funcs):
             x = f(x)
         return x
-    return the_func
+    return left_to_right_func if left_to_right else right_to_left_func
