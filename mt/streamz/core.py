@@ -107,5 +107,3 @@ class batch_map(Stream):
             raise
         else:
             return self._emit(result, metadata=metadata)
-
-
