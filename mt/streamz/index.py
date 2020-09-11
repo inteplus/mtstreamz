@@ -1,7 +1,7 @@
 '''Utitilites related to indexing.'''
 
 
-__all__ = ['IndexGrouping', 'on_list', 'hash_int']
+__all__ = ['IndexGrouping', 'on_list', 'hash_int', 'concat_funcs']
 
 
 def hash_int(i):
@@ -100,3 +100,24 @@ def on_list(func):
     def func_on_list(list_x, *args, **kwargs):
         return [func(x, *args, **kwargs) for x in list_x]
     return func_on_list
+
+
+def concat_funcs(*funcs):
+    '''Concatenate functions taking a single argument into a single function.
+
+    Parameters
+    ----------
+    *funcs : list
+        list of functions f1(x), f2(x), ..., fn(x)
+
+    Returns
+    -------
+    func : function
+        The function f(x) = f1(f2(...fn(x)...))
+    '''
+
+    def the_func(x):
+        for f in reversed(funcs):
+            x = f(x)
+        return x
+    return the_func
