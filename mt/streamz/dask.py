@@ -16,7 +16,7 @@ class rebatch(DaskStream, core.rebatch):
 
 
 @DaskStream.register_api()
-class partition2(DaskStream, core.partition):
+class partition2(DaskStream, core.partition2):
     pass
 
 
