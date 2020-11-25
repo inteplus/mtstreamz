@@ -16,6 +16,11 @@ class rebatch(DaskStream, core.rebatch):
 
 
 @DaskStream.register_api()
+class partition2(DaskStream, core.partition):
+    pass
+
+
+@DaskStream.register_api()
 class batch_map(DaskStream):
     __doc__ = core.batch_map.__doc__
 

@@ -69,6 +69,67 @@ class rebatch(Stream):
 
 
 @Stream.register_api()
+class partition2(Stream):
+    """ Partition a stream of items that can be None into stream of either None or fixed-size lists of non-None elements, preserving the stream's length.
+
+    Examples
+    --------
+    >>> source = Stream()
+    >>> source.partition2(3).sink(print)
+    >>> source.emit(None)
+    None
+    >>> source.emit(1)
+    None
+    >>> source.emit(None)
+    None
+    >>> source.emit(2)
+    None
+    >>> source.emit(3)
+    [1, 2, 3]
+    >>> source.emit(None)
+    None
+    >>> source.emit(4)
+    None
+    >>> source.emit(5)
+    None
+    >>> source.emit(None)
+    None
+    >>> source.emit(6)
+    [4, 5, 6]
+    """
+    _graphviz_shape = 'diamond'
+
+    def __init__(self, upstream, n, **kwargs):
+        self.n = n
+        self._buffer = []
+        self.metadata_buffer = []
+        Stream.__init__(self, upstream, **kwargs)
+
+    def update(self, x, who=None, metadata=None):
+        if x is None:
+            self._retain_refs(metadata)
+            res = self._emit(None, metadata)
+            self._release_refs(metadata)
+            return res
+
+        self._retain_refs(metadata)
+        self._buffer.append(x)
+        if isinstance(metadata, list):
+            self.metadata_buffer.extend(metadata)
+        else:
+            self.metadata_buffer.append(metadata)
+
+        if len(self._buffer) < self.n:
+            return self._emit(None)
+        
+        result, self._buffer = self._buffer, []
+        metadata_result, self.metadata_buffer = self.metadata_buffer, []
+        ret = self._emit(result, list(metadata_result))
+        self._release_refs(metadata_result)
+        return ret
+
+
+@Stream.register_api()
 class batch_map(Stream):
     """ Apply a function to every element of every batch in the stream
 
