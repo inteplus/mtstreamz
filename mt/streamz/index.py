@@ -1,25 +1,12 @@
 '''Utitilites related to indexing.'''
 
 
-__all__ = ['IndexGrouping', 'on_list', 'hash_int', 'join_funcs']
+from mt.base.deprecated import deprecated_func
+import mt.base.functional as _bf
+import mt.base.hashing as _bh
 
 
-def hash_int(i):
-    '''Knuth's cheap integer hash.
-
-    `Source <https://stackoverflow.com/questions/664014/what-integer-hash-function-are-good-that-accepts-an-integer-hash-key>`_
-
-    Parameters
-    ----------
-    i : int
-        an integer to hash
-    
-    Returns
-    -------
-    int
-        an unsigned 32-bit hashed integer
-    '''
-    return int(i*2654435761 & 0x7FFFFFFF)
+__all__ = ['IndexGrouping']
 
 
 class IndexGrouping(object):
@@ -93,6 +80,26 @@ class IndexGrouping(object):
     __call__.__doc__ = get_indices.__doc__
 
 
+@deprecated_func("0.0.8", suggested_func="mt.base.hashing.hash_int", removed_version="0.2.0", docstring_prefix="    ")
+def hash_int(i):
+    '''Knuth's cheap integer hash.
+
+    `Source <https://stackoverflow.com/questions/664014/what-integer-hash-function-are-good-that-accepts-an-integer-hash-key>`_
+
+    Parameters
+    ----------
+    i : int
+        an integer to hash
+    
+    Returns
+    -------
+    int
+        an unsigned 32-bit hashed integer
+    '''
+    return _bh.hash_int(i)
+
+
+@deprecated_func("0.0.8", suggested_func="mt.base.functional.on_list", removed_version="0.2.0", docstring_prefix="    ")
 def on_list(func):
     '''Turns a function that operates on each element at a time into a function that operates on a colletion of elements at a time. Can be used as a decorator.
 
@@ -106,11 +113,10 @@ def on_list(func):
     function
         a wrapper function `def func_on_list(list_x, *args, **kwargs) -> list_of_objects` that invokes `func(x, *args, **kwargs)` for each x in list_x.
     '''
-    def func_on_list(list_x, *args, **kwargs):
-        return [func(x, *args, **kwargs) for x in list_x]
-    return func_on_list
+    return _bf.on_list(func)
 
 
+@deprecated_func("0.0.8", suggested_func="mt.base.functional.join_funcs", removed_version="0.2.0", docstring_prefix="    ")
 def join_funcs(*funcs, left_to_right=True):
     '''Concatenate functions taking a single argument into a single function.
 
@@ -126,13 +132,4 @@ def join_funcs(*funcs, left_to_right=True):
     func : function
         The function `f(x) = fn(...f2(f1(x))...)` if left_to_right is True, else `f(x) = f1(f2(...fn(x)...))`.
     '''
-
-    def left_to_right_func(x):
-        for f in funcs:
-            x = f(x)
-        return x
-    def right_to_left_func(x):
-        for f in reversed(funcs):
-            x = f(x)
-        return x
-    return left_to_right_func if left_to_right else right_to_left_func
+    return _bf.join_funcs(*funcs, left_to_right=left_to_right)

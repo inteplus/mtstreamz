@@ -13,6 +13,7 @@ setup(name='mtstreamz',
           'dask>=2.24.0', # for simple multiprocessing jobs
           'distributed>=2.24.0',  # for simple multiprocessing jobs
           'streamz>=0.5.5', # for streaming
+          'mtbase>=1.0.0',
       ],
       url='https://github.com/inteplus/mtstreamz',
       project_urls={
